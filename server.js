@@ -26,6 +26,15 @@ app.use('/api/students', studentRoutes); // e.g., /api/students, /api/students/:
 app.use('/api/analytics', analyticsRoutes); // e.g., /api/analytics/:schoolId
 app.use('/api/users', usersRoutes);     // e.g., /api/users, /api/users/:schoolId, /api/users/:id
 
+// Serve index.html for any other route (excluding OPTIONS method)
+app.get('*', (req, res) => {
+  if (req.method !== 'OPTIONS') {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+  }
+});
+
+
+
 // Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
