@@ -5,7 +5,7 @@ const authController = require('../controllers/authController');
 
 /**
  * @swagger
- * /login:
+ * /auth/login:
  *   post:
  *     summary: User login
  *     description: Authenticates a user and returns a JWT token along with user details for authorized access.

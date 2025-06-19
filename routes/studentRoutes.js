@@ -13,4 +13,4 @@ router.delete('/:schoolId/:rfid', auth, roleCheck(['superadmin']), accessControl
 router.delete('/:schoolId', auth, roleCheck(['superadmin']), accessControl, studentController.deleteAllStudents);
 router.post('/import/:schoolId', auth, roleCheck(['admin', 'superadmin']), accessControl, studentController.importStudents);
 
-module.exports = router;
+module.exports = router; 
