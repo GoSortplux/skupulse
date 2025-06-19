@@ -1,7 +1,7 @@
 // server.js
 const express = require('express');
 const cors = require('cors');
-const path = require('path'); // ✅ Import path module
+const path = require('path');
 const connectDB = require('./config/db');
 const authRoutes = require('./routes/authRoutes');
 const schoolRoutes = require('./routes/schoolRoutes');
@@ -9,6 +9,8 @@ const studentRoutes = require('./routes/studentRoutes');
 const analyticsRoutes = require('./routes/analyticsRoutes');
 const usersRoutes = require('./routes/usersRoutes');
 const config = require('./config/config');
+const swaggerUi = require('swagger-ui-express');
+const swaggerJsdoc = require('swagger-jsdoc');
 
 const app = express();
 
@@ -22,6 +24,42 @@ app.use(express.urlencoded({ extended: true })); // Parses URL-encoded bodies
 
 // Serve static files (e.g., index.html, CSS, JS) from 'public' folder
 app.use(express.static(path.join(__dirname, 'public')));
+
+// Swagger setup
+const swaggerOptions = {
+  definition: {
+    openapi: '3.0.0',
+    info: {
+      title: 'School RFID API',
+      version: '1.0.0',
+      description: 'API for managing users, schools, students, and analytics in the School RFID system.',
+    },
+    servers: [
+      {
+        url: `http://localhost:${config.port}/api`,
+        description: 'Local development server',
+      },
+    ],
+    components: {
+      securitySchemes: {
+        bearerAuth: {
+          type: 'http',
+          scheme: 'bearer',
+          bearerFormat: 'JWT',
+        },
+      },
+    },
+    security: [
+      {
+        bearerAuth: [],
+      },
+    ],
+  },
+  apis: ['./routes/*.js', './controllers/*.js'], // Paths to files with JSDoc
+};
+
+const swaggerSpec = swaggerJsdoc(swaggerOptions);
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // Routes
 app.use('/api/auth', authRoutes);         // e.g., /api/auth/login
