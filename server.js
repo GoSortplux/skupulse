@@ -40,7 +40,7 @@ const swaggerOptions = {
         description: 'Local development server',
       },
       {
-        url: `https://skupulse-8k3l.onrender.com/api-docs`, // Replace with your production URL
+        url: `https://skupulse-8k3l.onrender.com/api-docs`, 
         description: 'Production server',
       }
     ],
