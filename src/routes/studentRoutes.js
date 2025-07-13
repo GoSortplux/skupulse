@@ -41,7 +41,7 @@ router.post('/', auth, roleCheck(['admin', 'superadmin']), accessControl, studen
  *     parameters:
  *       - in: path
  *         name: schoolId
- *         required: true
+ *         required: true 
  *         schema:
  *           type: string
  *     responses:

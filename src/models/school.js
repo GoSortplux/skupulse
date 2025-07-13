@@ -5,7 +5,7 @@ const schoolSchema = new mongoose.Schema({
   name: {
     type: String,
     required: true,
-    unique: true, // Ensures uniqueness, implying an index
+    // unique: true, // Ensures uniqueness, implying an index
   },
   logoUrl: { type: String }, // Optional
   address: { type: String }, // Optional

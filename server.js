@@ -17,7 +17,7 @@ const app = express();
 // Connect to MongoDB
 connectDB();
 
-// Middleware
+// Middleware 
 app.use(cors());
 app.use(express.json()); // Parses JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parses URL-encoded bodies
