@@ -23,7 +23,7 @@ app.use(express.json()); // Parses JSON bodies
 app.use(express.urlencoded({ extended: true })); // Parses URL-encoded bodies
 
 // Serve static files (e.g., index.html, CSS, JS) from 'public' folder
-app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, 'src', 'public')));
 
 // Swagger setup
 const swaggerOptions = {
