@@ -113,7 +113,7 @@ router.post('/', auth, roleCheck(['superadmin']), accessControl, usersController
  *       500:
  *         description: Server error
  */
-router.get('/users/:schoolId', auth, roleCheck(['superadmin']), accessControl, usersController.getUsersBySchool);
+router.get('/:schoolId', auth, roleCheck(['superadmin']), accessControl, usersController.getUsersBySchool);
 
 /**
  * @swagger
