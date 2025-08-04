@@ -8,12 +8,18 @@ const accessControl = require('../middleware/accessControl');
 
 /**
  * @swagger
- * /students:
+ * /students/{schoolId}:
  *   post:
  *     summary: Create a new student
  *     tags: [Students]
  *     security:
  *       - bearerAuth: []
+ *     parameters:
+ *       - in: path
+ *         name: schoolId
+ *         required: true
+ *         schema:
+ *           type: string
  *     requestBody:
  *       required: true
  *       content:
@@ -28,7 +34,7 @@ const accessControl = require('../middleware/accessControl');
  *       500:
  *         description: Server error
  */
-router.post('/', auth, roleCheck(['admin', 'superadmin']), accessControl, studentController.createStudent);
+router.post('/:schoolId', auth, roleCheck(['admin', 'superadmin']), accessControl, studentController.createStudent);
 
 /**
  * @swagger
@@ -148,7 +154,7 @@ router.delete('/:schoolId', auth, roleCheck(['superadmin']), accessControl, stud
 
 /**
  * @swagger
- * /students/import/{schoolId}:
+ * /students/{schoolId}/import:
  *   post:
  *     summary: Import students from a CSV file
  *     tags: [Students]
@@ -178,6 +184,6 @@ router.delete('/:schoolId', auth, roleCheck(['superadmin']), accessControl, stud
  *       500:
  *         description: Server error
  */
-router.post('/import/:schoolId', auth, roleCheck(['admin', 'superadmin']), accessControl, studentController.importStudents);
+router.post('/:schoolId/import', auth, roleCheck(['admin', 'superadmin']), accessControl, studentController.importStudents);
 
 module.exports = router;

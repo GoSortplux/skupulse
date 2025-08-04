@@ -7,7 +7,8 @@ const fs = require('fs');
 const upload = multer({ dest: 'uploads/' });
 
 exports.createStudent = async (req, res) => {
-  const { schoolId, rfid, name, admissionNumber, parentPhone, parentPhone2 } = req.body;
+  const { schoolId } = req.params;
+  const { rfid, name, admissionNumber, parentPhone, parentPhone2 } = req.body;
   try {
     const student = new Student({ schoolId, rfid, name, admissionNumber, parentPhone, parentPhone2 });
     await student.save();
@@ -75,8 +76,7 @@ exports.deleteAllStudents = async (req, res) => {
 exports.importStudents = [
   upload.single('file'),
   async (req, res) => {
-    const { schoolId } = req.body;
-    console.log('Received schoolId:', schoolId); // Debug log
+    const { schoolId } = req.params;
     try {
       const file = req.file;
       if (!file) return res.status(400).json({ message: 'No file uploaded' });
