@@ -2,6 +2,9 @@
 const mongoose = require('mongoose');
 
 const schoolSchema = new mongoose.Schema({
+  schoolId: {
+    type: String,
+  },
   name: {
     type: String,
     required: true,
