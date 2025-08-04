@@ -21,7 +21,11 @@ exports.getStudents = async (req, res) => {
   const { schoolId } = req.params;
   try {
     const students = await Student.find({ schoolId });
-    res.json(students);
+    const total = await Student.countDocuments({ schoolId });
+    res.json({
+      total,
+      students,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
