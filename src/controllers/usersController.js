@@ -41,14 +41,18 @@ exports.getUsersBySchool = async (req, res) => {
   const { schoolId } = req.params;
   try {
     const users = await User.find({ schoolId, role: 'admin' }); // Only return admins for the school
-    res.json(users.map(user => ({
-      id: user._id,
-      username: user.username,
-      role: user.role,
-      schoolId: user.schoolId,
-      email: user.email,
-      phoneNumber: user.phoneNumber,
-    })));
+    const total = await User.countDocuments({ schoolId, role: 'admin' });
+    res.json({
+      total,
+      users: users.map(user => ({
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        schoolId: user.schoolId,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      })),
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
