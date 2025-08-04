@@ -16,11 +16,13 @@ exports.createSchool = async (req, res) => {
     }
  
     const school = new School({ name, logoUrl, address, adminName });
+    school.schoolId = school._id;
     await school.save();
     res.status(201).json({
       message: 'School created successfully',
       school: {
         id: school._id,
+        schoolId: school.schoolId,
         name: school.name,
         logoUrl: school.logoUrl,
         address: school.address,
