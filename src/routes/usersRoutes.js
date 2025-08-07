@@ -74,7 +74,7 @@ router.post('/', auth, roleCheck(['superadmin']), accessControl, usersController
 
 /**
  * @swagger
- * /users/{schoolId}:
+ * /{schoolId}:
  *   get:
  *     summary: Get all admins for a specific school
  *     description: Retrieves a list of admin users associated with the given schoolId. Only superadmins can access this.
