@@ -194,7 +194,7 @@ router.put('/users/:id', auth, roleCheck(['superadmin']), accessControl, usersCo
 
 /**
  * @swagger
- * /users/{id}:
+ * /{id}:
  *   delete:
  *     summary: Delete a user
  *     description: Deletes an existing user by ID. Only superadmins can perform this action.
@@ -224,7 +224,7 @@ router.put('/users/:id', auth, roleCheck(['superadmin']), accessControl, usersCo
  *       500:
  *         description: Server error
  */
-router.delete('/users/:id', auth, roleCheck(['superadmin']), accessControl, usersController.deleteUser);
+router.delete('/:id', auth, roleCheck(['superadmin']), accessControl, usersController.deleteUser);
 
 /**
  * @swagger
