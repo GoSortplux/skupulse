@@ -8,7 +8,7 @@ const userSchema = new mongoose.Schema({
   phoneNumber: { type: String },
   password: { type: String, required: true },
   role: { type: String, enum: ['admin', 'superadmin'], required: true },
-  schoolId: { type: String, ref: 'School', required: function () { return this.role === 'admin'; } }, // Only admins have schoolId
+  schoolId: { type: mongoose.Schema.Types.ObjectId, ref: 'School', required: function () { return this.role === 'admin'; } }, // Only admins have schoolId
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });
