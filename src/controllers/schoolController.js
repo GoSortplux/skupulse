@@ -68,6 +68,31 @@ exports.updateSchool = async (req, res) => {
 
 exports.getSchools = async (req, res) => {
   try {
+    const { role, schoolId } = req.user;
+
+    if (role === 'admin') {
+      if (!schoolId) {
+        return res.status(400).json({ message: 'Admin user does not have a school ID' });
+      }
+      const school = await School.findById(schoolId);
+      if (!school) {
+        return res.status(404).json({ message: 'School not found' });
+      }
+      return res.json({
+        total: 1,
+        schools: [{
+          id: school._id,
+          name: school.name,
+          logoUrl: school.logoUrl,
+          address: school.address,
+          adminName: school.adminName,
+          createdAt: school.createdAt,
+          updatedAt: school.updatedAt,
+        }],
+      });
+    }
+
+    // Superadmin gets all schools
     const schools = await School.find();
     const total = await School.countDocuments();
     res.json({
