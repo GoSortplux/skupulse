@@ -17,10 +17,9 @@ exports.createUser = async (req, res) => {
       return res.status(400).json({ message: 'Username already exists' });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 10);
     const user = new User({
       username,
-      password: hashedPassword,
+      password,
       role,
       schoolId: role === 'admin' ? schoolId : undefined,
       email,
@@ -105,8 +104,7 @@ exports.resetPassword = async (req, res) => {
     const user = await User.findById(id);
     if (!user) return res.status(404).json({ message: 'User not found' });
 
-    const hashedPassword = await bcrypt.hash(newPassword, 10);
-    user.password = hashedPassword;
+    user.password = newPassword;
     await user.save();
 
     res.json({ message: 'Password reset successfully' });
