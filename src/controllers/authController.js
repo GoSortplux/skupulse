@@ -24,15 +24,24 @@ exports.login = async (req, res) => {
       role: user.role,
     };
 
-    if (user.role === 'admin' && user.schoolId) {
-      const school = await School.findById(user.schoolId);
-      if (school) {
-        userResponse.school = {
-          id: school._id,
-          name: school.name,
-          logoUrl: school.logoUrl,
-          address: school.address,
-        };
+    if (user.role === 'admin') {
+      if (user.schoolId) {
+        const school = await School.findById(user.schoolId);
+        if (school) {
+          userResponse.school = {
+            id: school._id,
+            name: school.name,
+            logoUrl: school.logoUrl,
+            address: school.address,
+          };
+        } else {
+          // School not found, explicitly set to null
+          console.log(`Warning: Admin user ${user.username} has a schoolId ${user.schoolId} that was not found in the database.`);
+          userResponse.school = null;
+        }
+      } else {
+        // Admin has no schoolId
+        userResponse.school = null;
       }
     }
 
