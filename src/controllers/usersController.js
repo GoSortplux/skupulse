@@ -59,8 +59,8 @@ exports.getUsersBySchool = async (req, res) => {
 
 exports.getUsers = async (req, res) => {
   try {
-    // Superadmin gets all users
-    const users = await User.find({});
+    // Superadmin gets all users, populating the school name
+    const users = await User.find({}).populate('schoolId', 'name');
     const total = await User.countDocuments({});
     res.json({
       total,
@@ -68,7 +68,8 @@ exports.getUsers = async (req, res) => {
         id: user._id,
         username: user.username,
         role: user.role,
-        schoolId: user.schoolId,
+        schoolId: user.schoolId ? user.schoolId._id : null,
+        schoolName: user.schoolId ? user.schoolId.name : null,
         email: user.email,
         phoneNumber: user.phoneNumber,
       })),
