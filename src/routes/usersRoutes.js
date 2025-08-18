@@ -8,6 +8,42 @@ const accessControl = require('../middleware/accessControl');
 
 /**
  * @swagger
+ * /:
+ *   get:
+ *     summary: Get all users
+ *     description: Retrieves a list of all users. Only superadmins can perform this action.
+ *     tags: [Users]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of users
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 type: object
+ *                 properties:
+ *                   id:
+ *                     type: string
+ *                   username:
+ *                     type: string
+ *                   role:
+ *                     type: string
+ *                   schoolId:
+ *                     type: string
+ *                   email:
+ *                     type: string
+ *                   phoneNumber:
+ *                     type: string
+ *       500:
+ *         description: Server error
+ */
+router.get('/', auth, roleCheck(['superadmin']), accessControl, usersController.getUsers);
+
+/**
+ * @swagger
  * /users:
  *   post:
  *     summary: Create a new user
