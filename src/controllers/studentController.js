@@ -34,11 +34,14 @@ exports.getStudents = async (req, res) => {
 
 exports.getAllStudents = async (req, res) => {
   try {
-    const students = await Student.find({});
+    const students = await Student.find({}).populate('schoolId', 'name');
     const total = await Student.countDocuments({});
     res.json({
       total,
-      students,
+      students: students.map(student => ({
+        ...student.toObject(),
+        schoolName: student.schoolId ? student.schoolId.name : null,
+      })),
     });
   } catch (error) {
     res.status(500).json({ message: error.message });

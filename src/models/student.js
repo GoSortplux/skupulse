@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 
 const studentSchema = new mongoose.Schema({
-  schoolId: { type: String, required: true, ref: 'School' },
+  schoolId: { type: mongoose.Schema.Types.ObjectId, required: true, ref: 'School' },
   rfid: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   admissionNumber: { type: String, required: true },
