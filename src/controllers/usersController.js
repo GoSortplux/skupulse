@@ -57,6 +57,27 @@ exports.getUsersBySchool = async (req, res) => {
   }
 };
 
+exports.getUsers = async (req, res) => {
+  try {
+    // Superadmin gets all users
+    const users = await User.find({});
+    const total = await User.countDocuments({});
+    res.json({
+      total,
+      users: users.map(user => ({
+        id: user._id,
+        username: user.username,
+        role: user.role,
+        schoolId: user.schoolId,
+        email: user.email,
+        phoneNumber: user.phoneNumber,
+      })),
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { username, password, role, schoolId, email, phoneNumber } = req.body;

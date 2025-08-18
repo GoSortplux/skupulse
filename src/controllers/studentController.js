@@ -32,6 +32,19 @@ exports.getStudents = async (req, res) => {
   }
 };
 
+exports.getAllStudents = async (req, res) => {
+  try {
+    const students = await Student.find({});
+    const total = await Student.countDocuments({});
+    res.json({
+      total,
+      students,
+    });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
 exports.updateStudent = async (req, res) => {
   const { schoolId, rfid } = req.params;
   

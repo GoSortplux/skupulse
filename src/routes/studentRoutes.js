@@ -8,6 +8,28 @@ const accessControl = require('../middleware/accessControl');
 
 /**
  * @swagger
+ * /students:
+ *   get:
+ *     summary: Get all students
+ *     tags: [Students]
+ *     security:
+ *       - bearerAuth: []
+ *     responses:
+ *       200:
+ *         description: A list of all students
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: array
+ *               items:
+ *                 $ref: '#/components/schemas/Student'
+ *       500:
+ *         description: Server error
+ */
+router.get('/', auth, roleCheck(['superadmin']), accessControl, studentController.getAllStudents);
+
+/**
+ * @swagger
  * /students/{schoolId}:
  *   post:
  *     summary: Create a new student
