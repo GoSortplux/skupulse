@@ -102,6 +102,8 @@ exports.importStudents = [
       const csvData = fs.readFileSync(file.path, 'utf8');
       Papa.parse(csvData, {
         header: true,
+        delimiter: '\t',
+        skipEmptyLines: true,
         complete: async (result) => {
           const students = result.data.map((row) => ({
             schoolId, // Use the provided schoolId
