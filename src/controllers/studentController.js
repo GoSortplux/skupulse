@@ -102,7 +102,7 @@ exports.importStudents = [
       const csvData = fs.readFileSync(file.path, 'utf8');
       Papa.parse(csvData, {
         header: true,
-        delimiter: '\t',
+        delimiter: ',',
         skipEmptyLines: true,
         transformHeader: header => header.trim(),
         complete: async (result) => {
@@ -128,7 +128,7 @@ exports.importStudents = [
           if (students.length === 0) {
             fs.unlinkSync(file.path);
             return res.status(400).json({
-              message: 'No valid student data found in CSV. Please ensure the column headers are correct and the file is tab-separated. Required headers are: rfid, name, admissionNumber, parentPhone.',
+              message: 'No valid student data found in CSV. Please ensure the column headers are correct and the file is comma-separated. Required headers are: rfid, name, admissionNumber, parentPhone.',
               detectedHeaders: result.meta.fields
             });
           }
