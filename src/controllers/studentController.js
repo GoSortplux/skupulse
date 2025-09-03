@@ -127,7 +127,10 @@ exports.importStudents = [
 
           if (students.length === 0) {
             fs.unlinkSync(file.path);
-            return res.status(400).json({ message: 'No valid student data found in CSV. Please ensure the column headers (rfid, name, admissionNumber, parentPhone) are correct and that the file is tab-separated.' });
+            return res.status(400).json({
+              message: 'No valid student data found in CSV. Please ensure the column headers are correct and the file is tab-separated. Required headers are: rfid, name, admissionNumber, parentPhone.',
+              detectedHeaders: result.meta.fields
+            });
           }
 
           try {
