@@ -114,7 +114,7 @@ exports.importStudents = [
             });
           }
 
-          const students = result.data.map((row) => ({
+          const rawStudents = result.data.map((row) => ({
             schoolId,
             rfid: row.rfid,
             name: row.name,
@@ -124,6 +124,13 @@ exports.importStudents = [
           })).filter(student =>
             student.rfid && student.name && student.admissionNumber && student.parentPhone
           );
+
+          // De-duplicate students by RFID, keeping the last occurrence.
+          const studentMap = new Map();
+          for (const student of rawStudents) {
+            studentMap.set(student.rfid, student);
+          }
+          const students = Array.from(studentMap.values());
 
           if (students.length === 0) {
             fs.unlinkSync(file.path);
