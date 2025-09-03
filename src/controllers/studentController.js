@@ -104,24 +104,43 @@ exports.importStudents = [
         header: true,
         delimiter: '\t',
         skipEmptyLines: true,
+        transformHeader: header => header.trim(),
         complete: async (result) => {
+          if (result.errors.length) {
+            fs.unlinkSync(file.path);
+            return res.status(400).json({
+              message: 'Failed to parse CSV file. Please check the file format.',
+              errors: result.errors,
+            });
+          }
+
           const students = result.data.map((row) => ({
-            schoolId, // Use the provided schoolId
+            schoolId,
             rfid: row.rfid,
             name: row.name,
             admissionNumber: row.admissionNumber,
             parentPhone: row.parentPhone,
             parentPhone2: row.parentPhone2 || undefined,
-          })).filter(student => 
-            student.rfid && student.name && student.admissionNumber && student.parentPhone // Ensure required fields
+          })).filter(student =>
+            student.rfid && student.name && student.admissionNumber && student.parentPhone
           );
+
           if (students.length === 0) {
             fs.unlinkSync(file.path);
-            return res.status(400).json({ message: 'No valid student data found in CSV' });
+            return res.status(400).json({ message: 'No valid student data found in CSV. Please ensure the column headers (rfid, name, admissionNumber, parentPhone) are correct and that the file is tab-separated.' });
           }
-          await Student.insertMany(students);
-          fs.unlinkSync(file.path); // Clean up file
-          res.status(201).json({ message: 'Students imported successfully' });
+
+          try {
+            await Student.insertMany(students);
+            fs.unlinkSync(file.path);
+            res.status(201).json({ message: 'Students imported successfully.' });
+          } catch (error) {
+            fs.unlinkSync(file.path);
+            res.status(400).json({
+              message: 'Student validation failed. Please check the data in your CSV file.',
+              error: error.message,
+            });
+          }
         },
         error: (error) => {
           fs.unlinkSync(file.path);
