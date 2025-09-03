@@ -134,13 +134,24 @@ exports.importStudents = [
           }
 
           try {
-            await Student.insertMany(students);
+            const operations = students.map(student => ({
+              updateOne: {
+                filter: { rfid: student.rfid, schoolId: student.schoolId },
+                update: { $set: student },
+                upsert: true,
+              },
+            }));
+
+            if (operations.length > 0) {
+              await Student.bulkWrite(operations);
+            }
+
             fs.unlinkSync(file.path);
-            res.status(201).json({ message: 'Students imported successfully.' });
+            res.status(200).json({ message: 'Students imported/updated successfully.' });
           } catch (error) {
             fs.unlinkSync(file.path);
-            res.status(400).json({
-              message: 'Student validation failed. Please check the data in your CSV file.',
+            res.status(500).json({
+              message: 'An error occurred during the bulk import process.',
               error: error.message,
             });
           }
