@@ -1,8 +1,9 @@
 // controllers/schoolController.js
 const School = require('../models/school');
+const User = require('../models/user');
 
 exports.createSchool = async (req, res) => {
-  const { name, logoUrl, address, adminName } = req.body;
+  const { name, logoUrl, address, admin } = req.body;
   try {
     if (!name) {
       return res.status(400).json({ message: 'School name is required' });
@@ -14,20 +15,34 @@ exports.createSchool = async (req, res) => {
         message: 'A school with this name already exists. Please use a different name.',
       });
     }
+
+    if (admin) {
+      const existingUser = await User.findById(admin);
+      if (!existingUser) {
+        return res.status(400).json({ message: 'Admin user not found' });
+      }
+    }
  
-    const school = new School({ name, logoUrl, address, adminName });
+    const school = new School({ name, logoUrl, address, admin });
     school.schoolId = school._id;
     await school.save();
+
+    const populatedSchool = await School.findById(school._id).populate('admin', 'username email');
+
     res.status(201).json({
       message: 'School created successfully',
       school: {
-        id: school._id,
-        schoolId: school.schoolId,
-        name: school.name,
-        logoUrl: school.logoUrl,
-        address: school.address,
-        adminName: school.adminName,
-        createdAt: school.createdAt,
+        id: populatedSchool._id,
+        schoolId: populatedSchool.schoolId,
+        name: populatedSchool.name,
+        logoUrl: populatedSchool.logoUrl,
+        address: populatedSchool.address,
+        admin: populatedSchool.admin ? {
+          id: populatedSchool.admin._id,
+          username: populatedSchool.admin.username,
+          email: populatedSchool.admin.email
+        } : null,
+        createdAt: populatedSchool.createdAt,
       },
     });
   } catch (error) {
@@ -37,13 +52,20 @@ exports.createSchool = async (req, res) => {
 
 exports.updateSchool = async (req, res) => {
   const { id } = req.params;
-  const { name, logoUrl, address, adminName } = req.body;
+  const { name, logoUrl, address, admin } = req.body;
   try {
+    if (admin) {
+      const existingUser = await User.findById(admin);
+      if (!existingUser) {
+        return res.status(400).json({ message: 'Admin user not found' });
+      }
+    }
+
     const school = await School.findByIdAndUpdate(
       id,
-      { name, logoUrl, address, adminName },
+      { name, logoUrl, address, admin },
       { new: true, runValidators: true }
-    );
+    ).populate('admin', 'username email');
     if (!school) return res.status(404).json({ message: 'School not found' });
     res.json({
       message: 'School updated successfully',
@@ -52,7 +74,11 @@ exports.updateSchool = async (req, res) => {
         name: school.name,
         logoUrl: school.logoUrl,
         address: school.address,
-        adminName: school.adminName,
+        admin: school.admin ? {
+          id: school.admin._id,
+          username: school.admin.username,
+          email: school.admin.email
+        } : null,
         updatedAt: school.updatedAt,
       },
     });
@@ -74,7 +100,7 @@ exports.getSchools = async (req, res) => {
       if (!schoolId) {
         return res.status(400).json({ message: 'Admin user does not have a school ID' });
       }
-      const school = await School.findById(schoolId);
+      const school = await School.findById(schoolId).populate('admin', 'username email');
       if (!school) {
         return res.status(404).json({ message: 'School not found' });
       }
@@ -85,7 +111,11 @@ exports.getSchools = async (req, res) => {
           name: school.name,
           logoUrl: school.logoUrl,
           address: school.address,
-          adminName: school.adminName,
+          admin: school.admin ? {
+            id: school.admin._id,
+            username: school.admin.username,
+            email: school.admin.email
+          } : null,
           createdAt: school.createdAt,
           updatedAt: school.updatedAt,
         }],
@@ -93,7 +123,7 @@ exports.getSchools = async (req, res) => {
     }
 
     // Superadmin gets all schools
-    const schools = await School.find();
+    const schools = await School.find().populate('admin', 'username email');
     const total = await School.countDocuments();
     res.json({
       total,
@@ -102,7 +132,11 @@ exports.getSchools = async (req, res) => {
         name: school.name,
         logoUrl: school.logoUrl,
         address: school.address,
-        adminName: school.adminName,
+        admin: school.admin ? {
+          id: school.admin._id,
+          username: school.admin.username,
+          email: school.admin.email
+        } : null,
         createdAt: school.createdAt,
         updatedAt: school.updatedAt,
       })),
