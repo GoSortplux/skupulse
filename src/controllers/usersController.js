@@ -1,5 +1,6 @@
 // controllers/usersController.js
 const User = require('../models/user');
+const School = require('../models/school');
 const bcrypt = require('bcryptjs');
 
 exports.createUser = async (req, res) => {
@@ -10,6 +11,16 @@ exports.createUser = async (req, res) => {
     }
     if (role === 'admin' && !schoolId) {
       return res.status(400).json({ message: 'School ID is required for admin role' });
+    }
+
+    if (role === 'admin') {
+      const school = await School.findById(schoolId);
+      if (!school) {
+        return res.status(404).json({ message: 'School not found' });
+      }
+      if (school.admin) {
+        return res.status(400).json({ message: 'School already has an admin. Please assign a different school or update the existing admin.' });
+      }
     }
 
     const existingUser = await User.findOne({ username });
@@ -26,6 +37,10 @@ exports.createUser = async (req, res) => {
       phoneNumber,
     });
     await user.save();
+
+    if (user.role === 'admin') {
+      await School.findByIdAndUpdate(user.schoolId, { admin: user._id });
+    }
 
     res.status(201).json({
       message: 'User created successfully',
@@ -81,22 +96,53 @@ exports.getUsers = async (req, res) => {
 exports.updateUser = async (req, res) => {
   const { id } = req.params;
   const { username, password, role, schoolId, email, phoneNumber } = req.body;
+
   try {
-    const updateData = { username, role, schoolId, email, phoneNumber };
-    if (password) {
-      updateData.password = await bcrypt.hash(password, 10); // Hash new password if provided
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
     }
-    const user = await User.findByIdAndUpdate(id, { $set: updateData }, { new: true, runValidators: true });
-    if (!user) return res.status(404).json({ message: 'User not found' });
+
+    const oldSchoolId = user.schoolId;
+
+    if (role === 'admin' && schoolId) {
+      const school = await School.findById(schoolId);
+      if (!school) {
+        return res.status(404).json({ message: 'School not found' });
+      }
+      if (school.admin && school.admin.toString() !== id) {
+        return res.status(400).json({ message: 'School already has an admin.' });
+      }
+    }
+
+    const updateData = { username, role, email, phoneNumber };
+    updateData.schoolId = role === 'admin' ? schoolId : undefined;
+    if (password) {
+      updateData.password = await bcrypt.hash(password, 10);
+    }
+
+    const updatedUser = await User.findByIdAndUpdate(id, { $set: updateData }, { new: true, runValidators: true });
+
+    const newSchoolId = updatedUser.schoolId;
+
+    if ((oldSchoolId ? oldSchoolId.toString() : null) !== (newSchoolId ? newSchoolId.toString() : null)) {
+      if (oldSchoolId) {
+        await School.findByIdAndUpdate(oldSchoolId, { admin: null });
+      }
+      if (newSchoolId && updatedUser.role === 'admin') {
+        await School.findByIdAndUpdate(newSchoolId, { admin: updatedUser._id });
+      }
+    }
+
     res.json({
       message: 'User updated successfully',
       user: {
-        id: user._id,
-        username: user.username,
-        role: user.role,
-        schoolId: user.schoolId,
-        email: user.email,
-        phoneNumber: user.phoneNumber,
+        id: updatedUser._id,
+        username: updatedUser.username,
+        role: updatedUser.role,
+        schoolId: updatedUser.schoolId,
+        email: updatedUser.email,
+        phoneNumber: updatedUser.phoneNumber,
       },
     });
   } catch (error) {
@@ -107,8 +153,17 @@ exports.updateUser = async (req, res) => {
 exports.deleteUser = async (req, res) => {
   const { id } = req.params;
   try {
-    const user = await User.findByIdAndDelete(id);
-    if (!user) return res.status(404).json({ message: 'User not found' });
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.role === 'admin' && user.schoolId) {
+      await School.findByIdAndUpdate(user.schoolId, { admin: null });
+    }
+
+    await User.findByIdAndDelete(id);
+
     res.json({ message: 'User deleted successfully' });
   } catch (error) {
     res.status(500).json({ message: error.message });
