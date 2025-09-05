@@ -12,6 +12,11 @@ exports.login = async (req, res) => {
     if (!user) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
+
+    const school = await School.findById(user.schoolId);
+    if (school?.disabled) {
+      return res.status(403).json({ message: 'Account deactivated' });
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });

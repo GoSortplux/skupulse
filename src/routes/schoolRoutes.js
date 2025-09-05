@@ -231,5 +231,7 @@ router.put('/:id', auth, roleCheck(['superadmin']), accessControl, schoolControl
  *                   example: "Server error"
  */
 router.get('/', auth, roleCheck(['admin', 'superadmin']), accessControl, schoolController.getSchools);
+router.put('/:id/disable', auth, roleCheck(['superadmin']), accessControl, schoolController.disableSchool);
+router.put('/:id/enable', auth, roleCheck(['superadmin']), accessControl, schoolController.enableSchool);
 
 module.exports = router;
