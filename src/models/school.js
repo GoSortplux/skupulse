@@ -13,6 +13,10 @@ const schoolSchema = new mongoose.Schema({
   logoUrl: { type: String }, // Optional
   address: { type: String }, // Optional
   admin: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: false },
+  disabled: {
+    type: Boolean,
+    default: false,
+  },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now },
 });

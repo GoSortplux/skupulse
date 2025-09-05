@@ -145,3 +145,27 @@ exports.getSchools = async (req, res) => {
     res.status(500).json({ message: error.message });
   }
 };
+
+exports.disableSchool = async (req, res) => {
+  try {
+    const school = await School.findByIdAndUpdate(req.params.id, { disabled: true }, { new: true });
+    if (!school) {
+      return res.status(404).json({ message: 'School not found' });
+    }
+    res.json({ message: 'School disabled successfully', school });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.enableSchool = async (req, res) => {
+  try {
+    const school = await School.findByIdAndUpdate(req.params.id, { disabled: false }, { new: true });
+    if (!school) {
+      return res.status(404).json({ message: 'School not found' });
+    }
+    res.json({ message: 'School enabled successfully', school });
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
