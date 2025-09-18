@@ -21,8 +21,11 @@ exports.login = async (req, res) => {
     if (!isMatch) {
       return res.status(400).json({ message: 'Invalid credentials' });
     }
-    const token = jwt.sign({ id: user._id, role: user.role, schoolId: user.schoolId }, config.jwtSecret, { expiresIn: config.JWT_EXPIRATION });
-
+    const token = jwt.sign(
+      { id: user._id, role: user.role, schoolId: user.schoolId },
+      config.jwtSecret
+      // no expiresIn → token never expires
+    );
     const userResponse = {
       userId: user._id,
       username: user.username,
