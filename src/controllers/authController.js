@@ -30,26 +30,22 @@ exports.login = async (req, res) => {
       userId: user._id,
       username: user.username,
       role: user.role,
+      school: null, // Initialize school as null
     };
 
-    if (user.role === 'admin') {
-      if (user.schoolId) {
-        const school = await School.findById(user.schoolId);
-        if (school) {
-          userResponse.school = {
-            id: school._id,
-            name: school.name,
-            logoUrl: school.logoUrl,
-            address: school.address,
-          };
-        } else {
-          // School not found, explicitly set to null
-          console.log(`Warning: Admin user ${user.username} has a schoolId ${user.schoolId} that was not found in the database.`);
-          userResponse.school = null;
-        }
+    if (user.role === 'admin' && user.schoolId) {
+      const school = await School.findById(user.schoolId);
+      if (school) {
+        userResponse.school = {
+          id: school._id,
+          name: school.name,
+          logoUrl: school.logoUrl,
+          address: school.address,
+        };
       } else {
-        // Admin has no schoolId
-        userResponse.school = null;
+        console.log(
+          `Warning: Admin user ${user.username} has a schoolId ${user.schoolId} that was not found in the database.`
+        );
       }
     }
 
