@@ -24,7 +24,7 @@ exports.login = async (req, res) => {
     const token = jwt.sign(
       { id: user._id, role: user.role, schoolId: user.schoolId },
       config.jwtSecret,
-      { expiresIn: process.env.JWT_EXPIRATION }
+      { expiresIn: process.env.JWT_EXPIRATION || '365d' }
     );
 
     const userResponse = {
